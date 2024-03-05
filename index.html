@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Download Excel File</title>
+</head>
+<body>
+    <label for="milestoneInput">Milestone:</label>
+    <input type="text" id="milestoneInput" placeholder="Enter milestone (e.g., March 2024)">
+    <button id="downloadButton">Download Excel File</button>
+
+    <script>
+        document.getElementById('downloadButton').addEventListener('click', function() {
+            // Use the input value or the current date if no input is provided
+            const milestone = document.getElementById('milestoneInput').value || getCurrentMonthYear();
+            const url = `http://localhost:8080/api/v1/gitlab/report?milestone=${encodeURIComponent(milestone)}`;
+
+            // Make the request to your server
+            fetch(url)
+            .then(response => response.blob())
+            .then(blob => {
+                // Create a link to download the file
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'file.xlsx';
+                document.body.appendChild(a); // Required for Firefox
+                a.click();
+                a.remove(); // Clean up
+            })
+            .catch(error => console.error('Error downloading file:', error));
+        });
+
+        function getCurrentMonthYear() {
+            const now = new Date();
+            const month = now.toLocaleString('default', { month: 'long' });
+            const year = now.getFullYear();
+            return `${month} ${year}`;
+        }
+    </script>
+</body>
+</html>
